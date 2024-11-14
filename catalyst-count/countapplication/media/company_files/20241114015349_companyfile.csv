@@ -1,0 +1,3 @@
+company_id,name,domain,year_founded,industry,size_range,locality,country,linkedin_url,current_employee_estimate,total_employee_estimate
+1,ibm,ibm.com,2001,information technology and services,10001+,"new york, new york, united states",united states,linkedin.com/company/ibm,274047,716906
+2,tata consultancy services,tcs.com,1999,information technology and services,10001+,"bombay, maharashtra, india",india,linkedin.com/company/tata-consultancy-services,190771,341369

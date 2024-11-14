@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company Query</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Dashboard</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{% url 'dashboard' %}">File Upload</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'querybuilder' %}">Query Builder</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'register_user' %}">User List</a>
+                    </li>
+                    
+                </ul>
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'email_login' %}">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container mt-5">
+        <h2 class="text-center mb-4">Company Query Builder</h2>
+
+        <!-- Query Form -->
+        <form id="queryForm">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="name" class="form-label">Name</label>
+                    <input type="text" class="form-control" id="name" name="name" placeholder="Enter Company Name">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="domain" class="form-label">Domain</label>
+                    <input type="text" class="form-control" id="domain" name="domain" placeholder="Enter Domain">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="industry" class="form-label">Industry</label>
+                    <input type="text" class="form-control" id="industry" name="industry" placeholder="Enter Industry">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="year_founded" class="form-label">Year Founded</label>
+                    <input type="number" class="form-control" id="year_founded" name="year_founded" placeholder="Enter Year Founded">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="city" class="form-label">City</label>
+                    <input type="text" class="form-control" id="city" name="city" placeholder="Enter City">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="state" class="form-label">State</label>
+                    <input type="text" class="form-control" id="state" name="state" placeholder="Enter State">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="country" class="form-label">Country</label>
+                    <input type="text" class="form-control" id="country" name="country" placeholder="Enter Country">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Query Data</button>
+            <button type="button" class="btn btn-secondary" id="resetBtn">Reset</button>
+        </form>
+
+        <div id="resultDiv" class="mt-4" style="display:none;">
+            <h4>Query Results:</h4>
+            <div id="resultTable"></div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Handle form submission
+        document.getElementById('queryForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const queryParams = new URLSearchParams();
+
+            formData.forEach((value, key) => {
+                if (value) {
+                    queryParams.append(key, value);
+                }
+            });
+
+            // Fetch from the correct endpoint (updated here for /company-search/)
+            fetch(`/data-search/?${queryParams.toString()}`, {
+                method: "GET",
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    const resultTable = document.getElementById('resultTable');
+                    resultTable.innerHTML = generateTable(data.data);
+                    document.getElementById('resultDiv').style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+
+        // Reset form and result div
+        document.getElementById('resetBtn').addEventListener('click', function() {
+            document.getElementById('queryForm').reset();
+            document.getElementById('resultDiv').style.display = 'none';
+        });
+
+        // Helper function to generate HTML table from query result
+        function generateTable(data) {
+            let table = `<table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Company ID</th>
+                                    <th>Name</th>
+                                    <th>Domain</th>
+                                    <th>Industry</th>
+                                    <th>Year Founded</th>
+                                    <th>City</th>
+                                    <th>State</th>
+                                    <th>Country</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
+
+            data.forEach(item => {
+                table += `<tr>
+                            <td>${item.company_id}</td>
+                            <td>${item.name}</td>
+                            <td>${item.domain}</td>
+                            <td>${item.industry}</td>
+                            <td>${item.year_founded}</td>
+                            <td>${item.locality}</td>
+                            <td>${item.state}</td>
+                            <td>${item.country}</td>
+                          </tr>`;
+            });
+
+            table += `</tbody></table>`;
+            return table;
+        }
+    </script>
+</body>
+</html>
